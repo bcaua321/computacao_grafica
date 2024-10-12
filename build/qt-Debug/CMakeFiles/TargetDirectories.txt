@@ -1,0 +1,9 @@
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/computacao_grafica.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/edit_cache.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/rebuild_cache.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/list_install_components.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/install.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/install/local.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/install/strip.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/computacao_grafica_autogen_timestamp_deps.dir
+/home/brenoprestes/computacao_grafica/build/qt-Debug/CMakeFiles/computacao_grafica_autogen.dir

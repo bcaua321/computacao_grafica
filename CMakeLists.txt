@@ -38,6 +38,10 @@ else()
     else()
         add_executable(computacao_grafica
             ${PROJECT_SOURCES}
+            primitiveobject.h primitiveobject.cpp
+            points.h points.cpp
+            factoryobject.h factoryobject.cpp
+            .gitignore
 
         )
     endif()

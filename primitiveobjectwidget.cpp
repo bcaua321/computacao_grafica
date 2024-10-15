@@ -16,7 +16,8 @@ void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
     vector<Points> coordinates = this->primitiveObject->points;
 
     if(this->primitiveObject->type == Point) {
-        painter.drawPoint(coordinates[0].get_firstPoint(), coordinates[0].get_secondPoint());
+        painter.setBrush(Qt::black);
+        painter.drawEllipse(coordinates[0].get_firstPoint(), coordinates[0].get_secondPoint(), 5, 5);
         return;
     }
 

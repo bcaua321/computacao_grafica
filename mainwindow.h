@@ -11,7 +11,7 @@ class MainWindow;
 }
 QT_END_NAMESPACE
 
-class QPaintEvent;
+//class QPaintEvent;
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -19,7 +19,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    virtual void paintEvent(QPaintEvent* event);
+   // virtual void paintEvent(QPaintEvent* event);
 
 private:
     Ui::MainWindow *ui;

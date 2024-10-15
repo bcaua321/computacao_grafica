@@ -42,6 +42,9 @@ else()
             points.h points.cpp
             factoryobject.h factoryobject.cpp
             .gitignore
+            primitiveobjectwidget.h primitiveobjectwidget.cpp
+
+
 
         )
     endif()

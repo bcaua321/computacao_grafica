@@ -43,6 +43,7 @@ else()
             factoryobject.h factoryobject.cpp
             .gitignore
             primitiveobjectwidget.h primitiveobjectwidget.cpp
+            geometrictransformation.h geometrictransformation.cpp
 
 
 

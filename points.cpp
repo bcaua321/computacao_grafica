@@ -12,3 +12,12 @@ int Points::get_firstPoint() {
 int Points::get_secondPoint() {
     return this->point_two;
 }
+
+void Points::set_x(int newX) {
+    this->point_one = newX;
+}
+
+
+void Points::set_y(int newY) {
+    this->point_one = newY;
+}

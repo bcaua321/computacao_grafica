@@ -7,6 +7,7 @@
 GeometricTransformation transformation;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
+    FactoryObject().create_line(),
     FactoryObject().create_polygon()
 };
 
@@ -54,15 +55,12 @@ void renderComboBoxCoordinates(Ui::MainWindow* ui) {
         // Trata o caso de selected ser nullptr
         return;
     }
-
-    auto pointCenter = matrix.pointCenter(selected->points);
+    ui->comboBox_2->clear();
 
     for (const auto& point : selected->points) {
         ui->comboBox_2->addItem(QString::fromStdString(coordenadasParaString(point)), QVariant(i));
         i++;
     }
-
-    ui->comboBox_2->addItem(QString::fromStdString(coordenadasParaString(matrix.vectorToPoint(pointCenter))), QVariant(i));
 }
 
 QHBoxLayout* MainWindow::renderWidgets() {
@@ -182,5 +180,11 @@ void MainWindow::on_rotationButton_clicked()
     } else {
         qDebug() << "Objeto primitivo não encontrado!";
     }
+}
+
+
+void MainWindow::on_comboBox_currentIndexChanged(int index)
+{
+    renderComboBoxCoordinates(ui);
 }
 

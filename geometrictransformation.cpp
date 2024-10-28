@@ -20,11 +20,11 @@ void GeometricTransformation::Translation(vector<Points>& points, vector<int> va
     }
 }
 
-void GeometricTransformation::Escalation(vector<Points>& points, vector<vector<int>> values) {
+void GeometricTransformation::Escalation(vector<Points>& points, vector<vector<double>> values) {
     auto pointCenter = matrix.pointCenter(points);
     auto escalationMatrix = matrix.setScaleMatrix(values);
     auto translationMatrix = matrix.setTranslationMatrix(pointCenter);
-    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negativeVec(pointCenter));
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negative(pointCenter));
 
     for(int i = 0; i < points.size(); i++) {
         auto point = matrix.pointToVector(points[i]);
@@ -36,16 +36,23 @@ void GeometricTransformation::Escalation(vector<Points>& points, vector<vector<i
     }
 }
 
-void GeometricTransformation::Rotation(vector<Points>& points, double tetah) {
-    auto pointCenter = points[0];
+void GeometricTransformation::Rotation(vector<Points>& points, double tetah, int pointIndex) {
+    vector<vector<double>> pointCenter;
+
+    if(pointIndex > points.size()) {
+        pointCenter = matrix.pointCenter(points);
+    } else {
+        pointCenter = matrix.pointToVector(points[pointIndex]);
+    }
+
     auto rotationMatrix = matrix.setRotationMatrix(degreesToRadians(tetah));
-    auto translationMatrix = matrix.setTranslationMatrix(matrix.pointToVector(pointCenter));
-    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negativeVec(matrix.pointToVector(pointCenter)));
+    auto translationMatrix = matrix.setTranslationMatrix(pointCenter);
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negative(pointCenter));
 
     for(int i = 1; i < points.size(); i++) {
         auto point = matrix.pointToVector(points[i]);
         point = matrix.multiply(point, translationMatrixNegative); // Move para a origem
-        point = matrix.multiply(point, rotationMatrix  ); // Aplica a escala
+        point = matrix.multiply(point, rotationMatrix); // Aplica a rotação
         point = matrix.multiply(point, translationMatrix); // Retorna à posição original
 
         points[i] = matrix.vectorToPoint(point);

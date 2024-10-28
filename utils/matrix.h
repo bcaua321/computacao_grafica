@@ -12,15 +12,14 @@ class Matrix
 public:
     Matrix();
 
-    vector<vector<int>> negative(vector<vector<int>> a);
-    vector<vector<int>> negativeVec(vector<vector<int>> a);
-    vector<vector<int>> multiply(vector<vector<int>> a, vector<vector<int>> b);
-    vector<vector<int>> setRotationMatrix(double tetah);
-    vector<vector<int>> setScaleMatrix(vector<vector<int>> values);
-    vector<vector<int>> setTranslationMatrix(vector<vector<int>> values);
-    vector<vector<int>> pointCenter(vector<Points> points);
-    vector<vector<int>> pointToVector(Points points);
-    Points vectorToPoint(vector<vector<int>> vec);
+    vector<vector<double>> negative(vector<vector<double>> a);
+    vector<vector<double>> multiply(vector<vector<double>> a, vector<vector<double>> b);
+    vector<vector<double>> setRotationMatrix(double tetah);
+    vector<vector<double>> setScaleMatrix(vector<vector<double>> values);
+    vector<vector<double>> setTranslationMatrix(vector<vector<double>> values);
+    vector<vector<double>> pointCenter(vector<Points> points);
+    vector<vector<double>> pointToVector(Points points);
+    Points vectorToPoint(vector<vector<double>> vec);
 };
 
 #endif // MATRIX_H

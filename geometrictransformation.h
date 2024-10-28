@@ -12,8 +12,8 @@ class GeometricTransformation
 public:
     GeometricTransformation();
     void Translation(vector<Points>& points, vector<int> values);
-    void Escalation(vector<Points>& points, vector<vector<int>> values);
-    void Rotation(vector<Points>& points, double tetah);
+    void Escalation(vector<Points>& points, vector<vector<double>> values);
+    void Rotation(vector<Points>& points, double tetah, int pointIndex);
 };
 
 #endif // GEOMETRICTRANSFORMATION_H

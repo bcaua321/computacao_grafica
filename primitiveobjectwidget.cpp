@@ -13,11 +13,6 @@ PrimitiveObject* PrimitiveObjectWidget::getCurrentPrimitive() {
     return this->primitiveObject;
 }
 
-void PrimitiveObjectWidget::updateData() {
-    // Código para atualizar a exibição dos dados conforme necessário.
-    this->update();  // Solicita a atualização do widget
-}
-
 void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
     vector<Points> coordinates = this->primitiveObject->points;

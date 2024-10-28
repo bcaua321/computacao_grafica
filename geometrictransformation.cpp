@@ -37,19 +37,13 @@ void GeometricTransformation::Escalation(vector<Points>& points, vector<vector<d
 }
 
 void GeometricTransformation::Rotation(vector<Points>& points, double tetah, int pointIndex) {
-    vector<vector<double>> pointCenter;
-
-    if(pointIndex > points.size()) {
-        pointCenter = matrix.pointCenter(points);
-    } else {
-        pointCenter = matrix.pointToVector(points[pointIndex]);
-    }
+    vector<vector<double>> pointReference = matrix.pointToVector(points[pointIndex]);
 
     auto rotationMatrix = matrix.setRotationMatrix(degreesToRadians(tetah));
-    auto translationMatrix = matrix.setTranslationMatrix(pointCenter);
-    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negative(pointCenter));
+    auto translationMatrix = matrix.setTranslationMatrix(pointReference);
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negative(pointReference));
 
-    for(int i = 1; i < points.size(); i++) {
+    for(int i = 0; i < points.size(); i++) {
         auto point = matrix.pointToVector(points[i]);
         point = matrix.multiply(point, translationMatrixNegative); // Move para a origem
         point = matrix.multiply(point, rotationMatrix); // Aplica a rotação

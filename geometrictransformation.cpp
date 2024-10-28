@@ -1,24 +1,53 @@
+#include "primitiveobject.h"
 #include "geometrictransformation.h"
+#include "points.h"
+#include "./utils/matrix.h"
 #include <cmath>
 #include <vector>
 
-const double teta = std::acos(-1) / 10;
-
 GeometricTransformation::GeometricTransformation() {}
 
+Matrix matrix;
 
-void GeometricTransformation::Translation(vector<Points> coordinates, int size) {
-    coordinates[0].set_x(coordinates[0].get_firstPoint() + size);
-    coordinates[0].set_x(coordinates[0].get_secondPoint() + size);
+double degreesToRadians(double degrees) {
+    return degrees * (M_PI / 180.0);
 }
 
-// GeometricTransformation::Translation(vector<Points> coordinates){
-//     int x = coordinates[0].get_firstPoint();
-//     int y = coordinates[0].get_secondPoint();
+void GeometricTransformation::Translation(vector<Points>& points, vector<int> values) {
+    for(int i = 0; i < points.size(); i++) {
+        points[i].set_x(points[i].get_firstPoint() + values[0]);
+        points[i].set_y(points[i].get_secondPoint() + values[1]);
+    }
+}
 
-//     int arr[3][3] = {
-//         { cos(pi), -sin(pi),  x*(1 - cos(pi)) + y * sin(pi)},
-//         { sin(pi), cos(pi),  y*(1 - cos(pi)) + x * sin(pi)},
-//         { 0, 0, 1}
-//     };
-// }
+void GeometricTransformation::Escalation(vector<Points>& points, vector<vector<int>> values) {
+    auto pointCenter = matrix.pointCenter(points);
+    auto escalationMatrix = matrix.setScaleMatrix(values);
+    auto translationMatrix = matrix.setTranslationMatrix(pointCenter);
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negativeVec(pointCenter));
+
+    for(int i = 0; i < points.size(); i++) {
+        auto point = matrix.pointToVector(points[i]);
+        point = matrix.multiply(point, translationMatrixNegative); // Move para a origem
+        point = matrix.multiply(point, escalationMatrix); // Aplica a escala
+        point = matrix.multiply(point, translationMatrix); // Retorna à posição original
+
+        points[i] = matrix.vectorToPoint(point);
+    }
+}
+
+void GeometricTransformation::Rotation(vector<Points>& points, double tetah) {
+    auto pointCenter = points[0];
+    auto rotationMatrix = matrix.setRotationMatrix(degreesToRadians(tetah));
+    auto translationMatrix = matrix.setTranslationMatrix(matrix.pointToVector(pointCenter));
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negativeVec(matrix.pointToVector(pointCenter)));
+
+    for(int i = 1; i < points.size(); i++) {
+        auto point = matrix.pointToVector(points[i]);
+        point = matrix.multiply(point, translationMatrixNegative); // Move para a origem
+        point = matrix.multiply(point, rotationMatrix  ); // Aplica a escala
+        point = matrix.multiply(point, translationMatrix); // Retorna à posição original
+
+        points[i] = matrix.vectorToPoint(point);
+    }
+}

@@ -12,6 +12,8 @@ class PrimitiveObjectWidget : public QWidget
 public:
     PrimitiveObjectWidget(QWidget *parent, PrimitiveObject *primitiveObject);
     ~PrimitiveObjectWidget() {}
+    PrimitiveObject* getCurrentPrimitive();
+    void updateData();
 
     virtual void paintEvent(QPaintEvent* event);
 private:

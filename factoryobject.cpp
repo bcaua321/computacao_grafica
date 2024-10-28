@@ -23,7 +23,7 @@ PrimitiveObject* FactoryObject::create_point() {
         Points(25, 25),
     };
 
-    PrimitiveObject *point = new PrimitiveObject("Point", Point, points);
+    PrimitiveObject *point = new PrimitiveObject(1, "Point", Point, points);
 
     return point;
 }
@@ -35,7 +35,7 @@ PrimitiveObject* FactoryObject::create_line() {
         Points(50, 100)
     };
 
-    PrimitiveObject *line = new PrimitiveObject("Reta", Line, points);
+    PrimitiveObject *line = new PrimitiveObject(2, "Reta", Line, points);
 
     return line;
 }
@@ -47,7 +47,7 @@ PrimitiveObject* FactoryObject::create_polygon() {
         Points(150, 150)
     };
 
-    PrimitiveObject *triangle = new PrimitiveObject("Triangulo", Polygon, points);
+    PrimitiveObject *triangle = new PrimitiveObject(3, "Triangulo", Polygon, points);
 
     return triangle;
 }

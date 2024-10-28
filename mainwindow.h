@@ -3,7 +3,13 @@
 
 #include <QWidget>
 #include <QMainWindow>
-
+#include <QHBoxLayout>
+#include <vector>
+#include <algorithm>
+#include <QtGui>
+#include "primitiveobjectwidget.h"
+#include "factoryobject.h"
+#include "geometrictransformation.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -19,7 +25,18 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    QHBoxLayout* renderWidgets();
+
+    static vector<PrimitiveObject*> primitiveObjects;
+    static vector<PrimitiveObjectWidget*> displayFile;
    // virtual void paintEvent(QPaintEvent* event);
+
+private slots:
+    void on_transformationButton_clicked();
+
+    void on_escalationButton_clicked();
+
+    void on_rotationButton_clicked();
 
 private:
     Ui::MainWindow *ui;

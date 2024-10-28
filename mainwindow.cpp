@@ -1,41 +1,164 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
-#include <QtGui>
-#include "primitiveobjectwidget.h"
-#include "factoryobject.h"
-#include <QHBoxLayout>
-#include <QSizePolicy>
+#include <QDesktopWidget>
 
+GeometricTransformation transformation();
+
+vector<PrimitiveObject*> MainWindow::primitiveObjects = {
+    FactoryObject().create_polygon()
+};
+
+vector<PrimitiveObjectWidget*>  MainWindow::displayFile;
+
+void renderComboBox(Ui::MainWindow* ui) {
+    int i = 0;
+
+    // Get name from list of defined primitiveObjects
+    for (const auto& primitiveObject : MainWindow::primitiveObjects) {
+        ui->comboBox->addItem(QString::fromStdString(primitiveObject->name), QVariant(i));
+        i++;
+    }
+}
+
+QHBoxLayout* MainWindow::renderWidgets() {
+    QWidget *container = new QWidget(this);
+    QHBoxLayout *layout = new QHBoxLayout(container);
+
+    // Get widget from display file
+    for (const auto& widget :  MainWindow::displayFile) {
+        layout->addWidget(widget);
+    }
+
+    return layout;
+}
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    QWidget *container = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(container);
+    renderComboBox(ui);
 
-    PrimitiveObject *ponto = FactoryObject().create_point();
-    PrimitiveObject *linha = FactoryObject().create_line();
-    PrimitiveObject *triangulo = FactoryObject().create_polygon();
+    // push loaded primitiveObjets and convert to primitiveObjectWidget
+    for (const auto& primitiveObject :  MainWindow::primitiveObjects) {
+        PrimitiveObjectWidget *widget = new PrimitiveObjectWidget(parent, primitiveObject);
+        displayFile.push_back(widget);
+    }
 
-    PrimitiveObjectWidget *widget_point = new PrimitiveObjectWidget(parent, ponto);
-    PrimitiveObjectWidget *widget_linha = new PrimitiveObjectWidget(parent, linha);
-    PrimitiveObjectWidget *widget_triangulo = new PrimitiveObjectWidget(parent, triangulo);
-
-    layout->addWidget(widget_point);
-    layout->addWidget(widget_linha);
-    layout->addWidget(widget_triangulo);
-
-    widget_point->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    widget_linha->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    widget_triangulo->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QHBoxLayout *layout = renderWidgets();
 
     ui->frame->setLayout(layout);
-    ui->frame->setMinimumHeight(600);
 }
 
 MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+void MainWindow::on_transformationButton_clicked()
+{
+    QString x = ui->lineEdit_x->text();
+    QString y = ui->lineEdit_y->text();
+
+    QString selected = ui->comboBox->currentText();
+    PrimitiveObject *primitive = NULL;
+
+    // search for selected primitiveObject
+    for (const auto& primitiveObjectWidget :  MainWindow::displayFile) {
+        auto tempPrimitiveObject = primitiveObjectWidget->getCurrentPrimitive();
+        if(tempPrimitiveObject->name == selected.toStdString()) {
+            primitive = tempPrimitiveObject;
+        }
+    }
+
+    if (primitive != nullptr) {
+        vector<int> values = {
+            x.toInt(),
+            y.toInt()
+        };
+
+        GeometricTransformation().Translation(primitive->points, values);
+
+        // update the coordinates
+        for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
+            if(primitiveObjects[i]->id == primitive->id) {
+                primitiveObjects[i] = primitive;
+            }
+        }
+
+        ui->frame->update();  // Atualiza apenas o frame especificado
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+void MainWindow::on_escalationButton_clicked()
+{
+    QString x = ui->lineEdit_x_4->text();
+    QString y = ui->lineEdit_y_2->text();
+
+    QString selected = ui->comboBox->currentText();
+    PrimitiveObject *primitive = NULL;
+
+    // search for selected primitiveObject
+    for (const auto& primitiveObjectWidget :  MainWindow::displayFile) {
+        auto tempPrimitiveObject = primitiveObjectWidget->getCurrentPrimitive();
+        if(tempPrimitiveObject->name == selected.toStdString()) {
+            primitive = tempPrimitiveObject;
+        }
+    }
+
+    if (primitive != nullptr) {
+        vector<vector<int>> values = {
+            {
+            x.toInt(),
+             y.toInt()}
+        };
+
+        GeometricTransformation().Escalation(primitive->points, values);
+
+        // update the coordinates
+        for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
+            if(primitiveObjects[i]->id == primitive->id) {
+                primitiveObjects[i] = primitive;
+            }
+        }
+
+        ui->frame->update();  // Atualiza apenas o frame especificado
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_rotationButton_clicked()
+{
+    QString x = ui->lineEdit_x_2->text();
+
+    QString selected = ui->comboBox->currentText();
+    PrimitiveObject *primitive = NULL;
+
+    // search for selected primitiveObject
+    for (const auto& primitiveObjectWidget :  MainWindow::displayFile) {
+        auto tempPrimitiveObject = primitiveObjectWidget->getCurrentPrimitive();
+        if(tempPrimitiveObject->name == selected.toStdString()) {
+            primitive = tempPrimitiveObject;
+        }
+    }
+
+    if (primitive != nullptr) {
+        GeometricTransformation().Rotation(primitive->points, x.toDouble());
+
+        // update the coordinates
+        for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
+            if(primitiveObjects[i]->id == primitive->id) {
+                primitiveObjects[i] = primitive;
+            }
+        }
+
+        ui->frame->update();  // repaint primitiveObjectWidget
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+

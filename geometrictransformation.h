@@ -3,6 +3,7 @@
 
 #include <vector>
 #include "points.h"
+#include "primitiveobject.h"
 
 using namespace std;
 
@@ -10,7 +11,9 @@ class GeometricTransformation
 {
 public:
     GeometricTransformation();
-    void Translation(vector<Points> coordinates, int size);
+    void Translation(vector<Points>& points, vector<int> values);
+    void Escalation(vector<Points>& points, vector<vector<int>> values);
+    void Rotation(vector<Points>& points, double tetah);
 };
 
 #endif // GEOMETRICTRANSFORMATION_H

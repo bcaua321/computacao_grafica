@@ -44,6 +44,12 @@ else()
             .gitignore
             primitiveobjectwidget.h primitiveobjectwidget.cpp
             geometrictransformation.h geometrictransformation.cpp
+            utils/matrix.h
+            utils/stacktransformation.h utils/stacktransformation.cpp
+            utils/matrix.cpp
+
+
+
 
 
 

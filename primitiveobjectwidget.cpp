@@ -9,10 +9,17 @@ PrimitiveObjectWidget::PrimitiveObjectWidget(QWidget *parent, PrimitiveObject *p
     this->primitiveObject = primitiveObject;
 }
 
+PrimitiveObject* PrimitiveObjectWidget::getCurrentPrimitive() {
+    return this->primitiveObject;
+}
+
+void PrimitiveObjectWidget::updateData() {
+    // Código para atualizar a exibição dos dados conforme necessário.
+    this->update();  // Solicita a atualização do widget
+}
+
 void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
-    auto size = this->size();
-    auto offset = 500;
     vector<Points> coordinates = this->primitiveObject->points;
 
     if(this->primitiveObject->type == Point) {
@@ -22,7 +29,7 @@ void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
     }
 
     if(this->primitiveObject->type == Line) {
-        painter.drawLine(coordinates[0].get_firstPoint(), coordinates[0].get_secondPoint(), size.width() - offset, size.height() - offset);
+        painter.drawLine(coordinates[0].get_firstPoint(), coordinates[0].get_secondPoint(), coordinates[1].get_firstPoint(), coordinates[1].get_secondPoint());
         return;
     }
 

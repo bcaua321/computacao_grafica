@@ -16,7 +16,8 @@ enum PrimitiveType {
 class PrimitiveObject
 {
 public:
-    PrimitiveObject(string name, PrimitiveType type, vector<Points> points);
+    PrimitiveObject(int id, string name, PrimitiveType type, vector<Points> points);
+    int id;
     string name;
     PrimitiveType type;
     vector<Points> points;

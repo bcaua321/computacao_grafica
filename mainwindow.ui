@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1212</width>
+    <width>1680</width>
     <height>952</height>
    </rect>
   </property>
@@ -17,8 +17,8 @@
    <widget class="QPushButton" name="pushButton">
     <property name="geometry">
      <rect>
-      <x>1010</x>
-      <y>10</y>
+      <x>1380</x>
+      <y>20</y>
       <width>131</width>
       <height>26</height>
      </rect>
@@ -37,21 +37,21 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>10</y>
-      <width>981</width>
-      <height>491</height>
+      <y>20</y>
+      <width>1300</width>
+      <height>768</height>
      </rect>
     </property>
     <property name="minimumSize">
      <size>
-      <width>0</width>
-      <height>491</height>
+      <width>1300</width>
+      <height>768</height>
      </size>
     </property>
     <property name="maximumSize">
      <size>
-      <width>16777215</width>
-      <height>491</height>
+      <width>1300</width>
+      <height>768</height>
      </size>
     </property>
     <property name="frameShape">
@@ -61,21 +61,11 @@
      <enum>QFrame::Raised</enum>
     </property>
    </widget>
-   <widget class="QLineEdit" name="lineEdit">
-    <property name="geometry">
-     <rect>
-      <x>1010</x>
-      <y>90</y>
-      <width>61</width>
-      <height>26</height>
-     </rect>
-    </property>
-   </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>1010</x>
-      <y>60</y>
+      <x>1380</x>
+      <y>110</y>
       <width>101</width>
       <height>18</height>
      </rect>
@@ -84,11 +74,11 @@
      <string>Transformação</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="pushButton_2">
+   <widget class="QPushButton" name="transformationButton">
     <property name="geometry">
      <rect>
-      <x>1140</x>
-      <y>90</y>
+      <x>1500</x>
+      <y>160</y>
       <width>61</width>
       <height>26</height>
      </rect>
@@ -97,13 +87,177 @@
      <string>Aplicar</string>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>1390</x>
+      <y>140</y>
+      <width>16</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>1450</x>
+      <y>140</y>
+      <width>16</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Y</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_x">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>160</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_y">
+    <property name="geometry">
+     <rect>
+      <x>1440</x>
+      <y>160</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="comboBox">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>60</y>
+      <width>131</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_4">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>200</y>
+      <width>66</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Rotação</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_x_2">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>230</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_5">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>270</y>
+      <width>121</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Escalonamento</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="rotationButton">
+    <property name="geometry">
+     <rect>
+      <x>1510</x>
+      <y>230</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Aplicar</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="escalationButton">
+    <property name="geometry">
+     <rect>
+      <x>1500</x>
+      <y>330</y>
+      <width>61</width>
+      <height>26</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Aplicar</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_6">
+    <property name="geometry">
+     <rect>
+      <x>1450</x>
+      <y>300</y>
+      <width>16</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Y</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_y_2">
+    <property name="geometry">
+     <rect>
+      <x>1440</x>
+      <y>330</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_7">
+    <property name="geometry">
+     <rect>
+      <x>1390</x>
+      <y>300</y>
+      <width>16</width>
+      <height>18</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>X</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="lineEdit_x_4">
+    <property name="geometry">
+     <rect>
+      <x>1380</x>
+      <y>330</y>
+      <width>41</width>
+      <height>26</height>
+     </rect>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1212</width>
+     <width>1680</width>
      <height>23</height>
     </rect>
    </property>

@@ -38,4 +38,3 @@ void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
         return;
     }
 }
-

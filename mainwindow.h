@@ -25,7 +25,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    QHBoxLayout* renderWidgets();
+    QWidget* renderWidgets();
 
     static vector<PrimitiveObject*> primitiveObjects;
     static vector<PrimitiveObjectWidget*> displayFile;
@@ -39,6 +39,8 @@ private slots:
     void on_rotationButton_clicked();
 
     void on_comboBox_currentIndexChanged(int index);
+
+    void on_pushButton_clicked();
 
 private:
     Ui::MainWindow *ui;

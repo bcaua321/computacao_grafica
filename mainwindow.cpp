@@ -3,11 +3,12 @@
 #include <QDesktopWidget>
 #include <string>
 #include "./utils/matrix.h"
+#include "./utils/windowviewport.h"
 
 GeometricTransformation transformation;
+WindowViewport windowViewport;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
-    FactoryObject().create_line(),
     FactoryObject().create_polygon()
 };
 
@@ -63,15 +64,18 @@ void renderComboBoxCoordinates(Ui::MainWindow* ui) {
     }
 }
 
-QHBoxLayout* MainWindow::renderWidgets() {
-    QWidget *container = new QWidget(this);
-    QHBoxLayout *layout = new QHBoxLayout(container);
+QWidget* MainWindow::renderWidgets() {
+    // Cria o widget pai que conterá os widgets filhos
+    QWidget *layout = new QWidget(this);
 
-    // Get widget from display file
-    for (const auto& widget :  MainWindow::displayFile) {
-        layout->addWidget(widget);
+    QHBoxLayout* hLayout = new QHBoxLayout(layout);
+
+    // A seguir, adiciona os widgets filhos ao layout
+    for (const auto& widget : MainWindow::displayFile) {
+        hLayout->addWidget(widget); // Define o widget pai corretamente
     }
 
+    // Retorna o widget com os widgets filhos já gerenciados pelo layout
     return layout;
 }
 
@@ -92,9 +96,28 @@ MainWindow::MainWindow(QWidget *parent)
         displayFile.push_back(widget);
     }
 
-    QHBoxLayout *layout = renderWidgets();
+    // Cria um layout para o centralWidget se ainda não tiver um
+    QHBoxLayout *mainLayout = new QHBoxLayout(ui->centralwidget);
+    ui->centralwidget->setLayout(mainLayout);
 
-    ui->frame->setLayout(layout);
+    // Define o frame ou qualquer outro widget para ser expansível
+    ui->frame->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    // Adiciona o frame ao layout do centralWidget para que ele redimensione
+    mainLayout->addWidget(ui->frame);
+    mainLayout->addWidget(ui->frame_3);
+
+    // Define um layout para os widgets internos do frame, caso necessário
+    QHBoxLayout *frameLayout = new QHBoxLayout(ui->frame);
+    frameLayout->setContentsMargins(0, 0, 0, 0);  // Remove as margens para ocupar todo o espaço
+    frameLayout->setSpacing(0);
+
+    ui->frame->setLayout(frameLayout);
+
+    // Adiciona widgets ou containers dentro do frame
+    QWidget *container = renderWidgets();
+
+    frameLayout->addWidget(container);
 }
 
 MainWindow::~MainWindow()
@@ -139,11 +162,24 @@ void MainWindow::on_escalationButton_clicked()
 
 
     if (primitive != nullptr) {
+        double x_double = x.toDouble();
+        double y_double = y.toDouble();
+
+        if(x_double == 0) {
+            x_double = 1;
+        }
+
+        if(y_double == 0) {
+            y_double = 1;
+        }
+
         vector<vector<double>> values = {
             {
-            x.toDouble(),
-            y.toDouble()}
+            x_double,
+            y_double }
         };
+
+
 
         transformation.Escalation(primitive->points, values);
 
@@ -186,5 +222,15 @@ void MainWindow::on_rotationButton_clicked()
 void MainWindow::on_comboBox_currentIndexChanged(int index)
 {
     renderComboBoxCoordinates(ui);
+}
+
+
+void MainWindow::on_pushButton_clicked()
+{
+    // search for selected primitiveObject
+    for (const auto& primitiveObject :  MainWindow::primitiveObjects) {
+        primitiveObject->points = windowViewport.getNewCoordinates(primitiveObject->points);
+    }
+
 }
 

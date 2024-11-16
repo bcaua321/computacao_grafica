@@ -31,6 +31,19 @@ vector<vector<double>> Matrix::negative(vector<vector<double>> a){
     return a;
 }
 
+vector<double> Matrix::rotateVector(double x, double y, double theta) {
+    // Cálculo da rotação
+    double cosTheta = cos(theta);
+    double sinTheta = sin(theta);
+
+    // Aplicando a matriz de rotação
+    double xNew = cosTheta * x - sinTheta * y;
+    double yNew = sinTheta * x + cosTheta * y;
+
+    // Retorna o vetor rotacionado
+    return {xNew, yNew};
+}
+
 // set a rotation matrix for the angle
 vector<vector<double>> Matrix::setRotationMatrix(double tetah){
     vector<vector<double>> rotationMatrix = {

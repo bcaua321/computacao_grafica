@@ -325,6 +325,102 @@
       </rect>
      </property>
     </widget>
+    <widget class="QPushButton" name="arrowUp">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>370</y>
+       <width>40</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoUp"/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="arrowDown">
+     <property name="geometry">
+      <rect>
+       <x>130</x>
+       <y>430</y>
+       <width>40</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoDown"/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="arrowRight">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>400</y>
+       <width>41</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoNext"/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="arrowLeft">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>400</y>
+       <width>41</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoPrevious"/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="arroRotateLeft">
+     <property name="geometry">
+      <rect>
+       <x>100</x>
+       <y>500</y>
+       <width>41</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoPrevious"/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="arroRotateRight">
+     <property name="geometry">
+      <rect>
+       <x>160</x>
+       <y>500</y>
+       <width>41</width>
+       <height>26</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="QIcon::ThemeIcon::GoNext"/>
+     </property>
+    </widget>
    </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">

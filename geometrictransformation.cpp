@@ -52,3 +52,21 @@ void GeometricTransformation::Rotation(vector<Points>& points, double tetah, int
         points[i] = matrix.vectorToPoint(point);
     }
 }
+
+
+void GeometricTransformation::RotationTest(vector<Points>& points, double tetah) {
+    vector<vector<double>> pointReference = matrix.pointCenter(points);
+
+    auto rotationMatrix = matrix.setRotationMatrix(degreesToRadians(tetah));
+    auto translationMatrix = matrix.setTranslationMatrix(pointReference);
+    auto translationMatrixNegative = matrix.setTranslationMatrix(matrix.negative(pointReference));
+
+    for(int i = 0; i < points.size(); i++) {
+        auto point = matrix.pointToVector(points[i]);
+        point = matrix.multiply(point, translationMatrixNegative); // Move para a origem
+        point = matrix.multiply(point, rotationMatrix); // Aplica a rotação
+        point = matrix.multiply(point, translationMatrix); // Retorna à posição original
+
+        points[i] = matrix.vectorToPoint(point);
+    }
+}

@@ -17,7 +17,6 @@ void Points::set_x(int newX) {
     this->point_one = newX;
 }
 
-
 void Points::set_y(int newY) {
     this->point_two = newY;
 }

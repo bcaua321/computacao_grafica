@@ -21,7 +21,7 @@ public:
     string name;
     PrimitiveType type;
     vector<Points> points;
-    vector<Points> pointsView;
+    vector<Points> pointsOriginals;
 };
 
 #endif // PRIMITIVEOBJECT_H

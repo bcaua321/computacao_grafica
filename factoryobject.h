@@ -3,6 +3,7 @@
 
 #include "primitiveobject.h"
 #include <vector>
+#include "points.h"
 
 class FactoryObject
 {
@@ -12,6 +13,7 @@ public:
     PrimitiveObject* create_point();
     PrimitiveObject* create_line();
     PrimitiveObject* create_polygon();
+    vector<Points> create_windowCoordiantes(int xMin, int xMax, int yMin, int yMax);
 };
 
 #endif // FACTORYOBJECT_H

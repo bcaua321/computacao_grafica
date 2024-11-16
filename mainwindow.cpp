@@ -3,10 +3,12 @@
 #include <QDesktopWidget>
 #include <string>
 #include "./utils/matrix.h"
-#include "./utils/windowviewport.h"
+#include "./utils/window.h"
+#include <QRect>
 
 GeometricTransformation transformation;
-WindowViewport windowViewport;
+Window windowSCN(1200, 1000, 1200/2, 1000/2);
+double angle = 0;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
     FactoryObject().create_polygon()
@@ -89,6 +91,8 @@ MainWindow::MainWindow(QWidget *parent)
     // Use o caractere Unicode θ (U+03B8)
     QString unicodeChar = QString::fromUtf8("\u03B8");
     ui->label_angle->setText(unicodeChar);
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
 
     // push loaded primitiveObjets and convert to primitiveObjectWidget
     for (const auto& primitiveObject :  MainWindow::primitiveObjects) {
@@ -118,6 +122,9 @@ MainWindow::MainWindow(QWidget *parent)
     QWidget *container = renderWidgets();
 
     frameLayout->addWidget(container);
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+    // Configurar o QTimer para recalcular as coordenadas
 }
 
 MainWindow::~MainWindow()
@@ -180,8 +187,7 @@ void MainWindow::on_escalationButton_clicked()
         };
 
 
-
-        transformation.Escalation(primitive->points, values);
+        transformation.Escalation(primitive->pointsOriginals, values);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -204,6 +210,7 @@ void MainWindow::on_rotationButton_clicked()
 
     if (primitive != nullptr) {
         transformation.Rotation(primitive->points, tetah.toDouble(), indexOfPoint(ui));
+        primitive->pointsOriginals = primitive->points;
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -227,10 +234,253 @@ void MainWindow::on_comboBox_currentIndexChanged(int index)
 
 void MainWindow::on_pushButton_clicked()
 {
-    // search for selected primitiveObject
-    for (const auto& primitiveObject :  MainWindow::primitiveObjects) {
-        primitiveObject->points = windowViewport.getNewCoordinates(primitiveObject->points);
-    }
+}
 
+void MainWindow::on_arrowUp_clicked()
+{
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
+    auto points = primitive->points;
+
+    if (primitive != nullptr) {
+        windowSCN.translateMatrix[0][1] += 10;
+        auto x = windowSCN.translateMatrix[0][0];
+        auto y =  windowSCN.translateMatrix[0][1];
+
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, 10}});
+        auto windowPoints = windowSCN.points;
+        for(int i = 0; i < windowPoints.size(); i++) {
+            auto point = Matrix().pointToVector(windowPoints[i]);
+
+            point = Matrix().multiply(point, translationUpMatrix);
+
+            windowSCN.points[i] = Matrix().vectorToPoint(point);
+        }
+
+        windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+        windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+
+            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_arrowDown_clicked()
+{
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
+    auto points = primitive->points;
+
+    if (primitive != nullptr) {
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, -10}});
+        auto windowPoints = windowSCN.points;
+
+        for(int i = 0; i < windowPoints.size(); i++) {
+            auto point = Matrix().pointToVector(windowPoints[i]);
+
+            point = Matrix().multiply(point, translationUpMatrix);
+
+            windowSCN.points[i] = Matrix().vectorToPoint(point);
+        }
+
+
+        windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+        windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+
+            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_arrowLeft_clicked()
+{
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
+    auto points = primitive->points;
+
+    if (primitive != nullptr) {
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{10, 0}});
+        auto windowPoints = windowSCN.points;
+        for(int i = 0; i < windowPoints.size(); i++) {
+            auto point = Matrix().pointToVector(windowPoints[i]);
+
+            point = Matrix().multiply(point, translationUpMatrix);
+
+            windowSCN.points[i] = Matrix().vectorToPoint(point);
+        }
+
+        windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+        windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+
+            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_arrowRight_clicked()
+{
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
+    auto points = primitive->points;
+
+    if (primitive != nullptr) {
+        windowSCN.translateMatrix[0][0] -= 10;
+
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{-10, 0}});
+        auto windowPoints = windowSCN.points;
+
+        for(int i = 0; i < windowPoints.size(); i++) {
+            auto point = Matrix().pointToVector(windowPoints[i]);
+
+            point = Matrix().multiply(point, translationUpMatrix);
+
+            windowSCN.points[i] = Matrix().vectorToPoint(point);
+        }
+
+        windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+        windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+
+            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_arroRotateLeft_clicked()
+{
+    Matrix matrix;
+    GeometricTransformation geometric;
+
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    auto points = primitive->points;
+
+    geometric.RotationTest(windowSCN.points, 10);
+    auto view = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], 0);
+
+    if (primitive != nullptr) {
+
+        for(int i = 0; i < points.size(); i++) {
+             // Converter ponto para vetor
+             auto point = Matrix().pointToVector(points[i]);
+
+             // Aplicar matriz de normalização
+             point = Matrix().multiply(point,  windowSCN.getNormMatrix());
+
+             // Aplicar transformação para a viewport
+             auto res = windowSCN.transformNormToViewport(
+                 point[0][0], point[0][1],
+                 400, this->frame_width,
+                 400, this->frame_heigth
+                 );
+
+             // Converter vetor de volta para ponto
+             points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
+}
+
+
+void MainWindow::on_arroRotateRight_clicked()
+{
+    Matrix matrix;
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
+
+    auto points = primitive->points;
+
+    if (primitive != nullptr) {
+
+        auto view = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], 0);
+
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+
+            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        primitive->points = points;
+        ui->frame->update();
+    } else {
+        qDebug() << "Objeto primitivo não encontrado!";
+    }
 }
 

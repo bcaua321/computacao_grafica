@@ -48,7 +48,20 @@ PrimitiveObject* FactoryObject::create_polygon() {
     };
 
     PrimitiveObject *triangle = new PrimitiveObject(3, "Triangulo", Polygon, points);
+    triangle->pointsOriginals = points;
 
     return triangle;
+}
+
+vector<Points> FactoryObject::create_windowCoordiantes(int xMin, int xMax, int yMin, int yMax) {
+    vector<Points> points = {
+        Points(xMin, yMin),
+        Points(xMax, yMin),
+        Points(xMax, yMax),
+        Points(xMin, yMax)
+    };
+
+
+    return points;
 }
 

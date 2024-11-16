@@ -47,7 +47,13 @@ else()
             utils/matrix.h
 
             utils/matrix.cpp
-            utils/windowviewport.h utils/windowviewport.cpp
+
+            widgets/customframe.h widgets/customframe.cpp
+            utils/window.h utils/window.cpp
+
+
+
+
 
 
 

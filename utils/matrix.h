@@ -18,6 +18,7 @@ public:
     vector<vector<double>> setScaleMatrix(vector<vector<double>> values);
     vector<vector<double>> setTranslationMatrix(vector<vector<double>> values);
     vector<vector<double>> pointCenter(vector<Points> points);
+    vector<double> pointCenterWindow(double xmin, double xmax, double ymin, double ymax);
     vector<vector<double>> pointToVector(Points points);
     vector<double> rotateVector(double x, double y, double theta);
     // Retorna a matriz de rotação para um dado ângulo (em radianos)

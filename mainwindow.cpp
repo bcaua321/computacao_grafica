@@ -7,7 +7,7 @@
 #include <QRect>
 
 GeometricTransformation transformation;
-Window windowSCN(1200, 1000, 1200/2, 1000/2);
+Window windowSCN(1200/2, 900/2, 1200, 900);
 double angle = 0;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
@@ -247,10 +247,8 @@ void MainWindow::on_arrowUp_clicked()
 
     if (primitive != nullptr) {
         windowSCN.translateMatrix[0][1] += 10;
-        auto x = windowSCN.translateMatrix[0][0];
-        auto y =  windowSCN.translateMatrix[0][1];
 
-        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, 10}});
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, -10}});
         auto windowPoints = windowSCN.points;
         for(int i = 0; i < windowPoints.size(); i++) {
             auto point = Matrix().pointToVector(windowPoints[i]);
@@ -291,7 +289,7 @@ void MainWindow::on_arrowDown_clicked()
     auto points = primitive->points;
 
     if (primitive != nullptr) {
-        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, -10}});
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{0, 10}});
         auto windowPoints = windowSCN.points;
 
         for(int i = 0; i < windowPoints.size(); i++) {
@@ -335,7 +333,7 @@ void MainWindow::on_arrowLeft_clicked()
     auto points = primitive->points;
 
     if (primitive != nullptr) {
-        auto translationUpMatrix = Matrix().setTranslationMatrix({{10, 0}});
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{-11, 0}});
         auto windowPoints = windowSCN.points;
         for(int i = 0; i < windowPoints.size(); i++) {
             auto point = Matrix().pointToVector(windowPoints[i]);
@@ -378,7 +376,7 @@ void MainWindow::on_arrowRight_clicked()
     if (primitive != nullptr) {
         windowSCN.translateMatrix[0][0] -= 10;
 
-        auto translationUpMatrix = Matrix().setTranslationMatrix({{-10, 0}});
+        auto translationUpMatrix = Matrix().setTranslationMatrix({{10, 0}});
         auto windowPoints = windowSCN.points;
 
         for(int i = 0; i < windowPoints.size(); i++) {
@@ -409,7 +407,6 @@ void MainWindow::on_arrowRight_clicked()
     }
 }
 
-
 void MainWindow::on_arroRotateLeft_clicked()
 {
     Matrix matrix;
@@ -419,31 +416,54 @@ void MainWindow::on_arroRotateLeft_clicked()
     this->frame_heigth = ui->frame->height();
 
     PrimitiveObject *primitive = selectedObject(ui);
+    primitive->points = primitive->pointsOriginals;
     auto points = primitive->points;
+    angle += 10;
 
-    geometric.RotationTest(windowSCN.points, 10);
-    auto view = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], 0);
+    // Aplicar rotação no mundo
+
+    geometric.RotationTest(windowSCN.points, angle);
+    windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+    windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+    // Rotacionar o vetor viewUp corretamente
+    windowSCN.viewUp = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], angle);
+
+    // Calcular o ângulo formado pelo viewUp com o eixo Y
+    double normVup = sqrt(windowSCN.viewUp[0] * windowSCN.viewUp[0] + windowSCN.viewUp[1] * windowSCN.viewUp[1]);
+    double cosTheta = windowSCN.viewUp[1] / normVup;
+    double angleRadians = acos(cosTheta); // Ângulo em radianos
+
+
+    if (windowSCN.viewUp[0] < 0) {
+        angleRadians = -angleRadians;
+    }
+
+    // Aplicar rotação reversa para corrigir a orientação da janela
+    windowSCN.viewUp = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], -angle);
 
     if (primitive != nullptr) {
 
+        // Atualizar os pontos transformados
         for(int i = 0; i < points.size(); i++) {
-             // Converter ponto para vetor
-             auto point = Matrix().pointToVector(points[i]);
+            // Converter ponto para vetor
+            auto point = Matrix().pointToVector(points[i]);
 
-             // Aplicar matriz de normalização
-             point = Matrix().multiply(point,  windowSCN.getNormMatrix());
+            // Aplicar matriz de normalização ajustada com o ângulo calculado
+            point = Matrix().multiply(point,  windowSCN.getNormMatrix(angleRadians));
 
-             // Aplicar transformação para a viewport
-             auto res = windowSCN.transformNormToViewport(
-                 point[0][0], point[0][1],
-                 400, this->frame_width,
-                 400, this->frame_heigth
-                 );
+            // Aplicar transformação para a viewport
+            auto res = windowSCN.transformNormToViewport(
+                point[0][0], point[0][1],
+                0, this->frame_width,
+                0, this->frame_heigth
+                );
 
-             // Converter vetor de volta para ponto
-             points[i] = Matrix().vectorToPoint(res);
+            // Converter vetor de volta para ponto
+            points[i] = Matrix().vectorToPoint(res);
         }
 
+        // Atualizar os pontos do objeto
         primitive->points = points;
         ui->frame->update();
     } else {
@@ -455,28 +475,59 @@ void MainWindow::on_arroRotateLeft_clicked()
 void MainWindow::on_arroRotateRight_clicked()
 {
     Matrix matrix;
+    GeometricTransformation geometric;
+
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
     PrimitiveObject *primitive = selectedObject(ui);
     primitive->points = primitive->pointsOriginals;
-
     auto points = primitive->points;
+    angle -= 10;
+    // Aplicar rotação no mundo
+
+    geometric.RotationTest(windowSCN.points, angle);
+    windowSCN.pointCenter = Matrix().pointCenter(windowSCN.points);
+    windowSCN.recalculateValues(windowSCN.pointCenter[0][0], windowSCN.pointCenter[0][1]);
+
+    // Rotacionar o vetor viewUp corretamente
+    windowSCN.viewUp = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], angle);
+
+    // Calcular o ângulo formado pelo viewUp com o eixo Y
+    double normVup = sqrt(windowSCN.viewUp[0] * windowSCN.viewUp[0] + windowSCN.viewUp[1] * windowSCN.viewUp[1]);
+    double cosTheta = windowSCN.viewUp[1] / normVup;
+    double angleRadians = acos(cosTheta); // Ângulo em radianos
+
+    if (windowSCN.viewUp[0] < 0) {
+        angleRadians = -angleRadians;
+    }
+
+
+    // Aplicar rotação reversa para corrigir a orientação da janela
+    windowSCN.viewUp = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], -angle);
 
     if (primitive != nullptr) {
 
-        auto view = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], 0);
-
+        // Atualizar os pontos transformados
         for(int i = 0; i < points.size(); i++) {
+            // Converter ponto para vetor
             auto point = Matrix().pointToVector(points[i]);
 
-            point =  Matrix().multiply(point, windowSCN.getNormMatrix());
+            // Aplicar matriz de normalização ajustada com o ângulo calculado
+            point = Matrix().multiply(point,  windowSCN.getNormMatrix(angleRadians));
 
-            auto res = windowSCN.transformNormToViewport(point[0][0], point[0][1], 0,  this->frame_width, 0, this->frame_heigth);
+            // Aplicar transformação para a viewport
+            auto res = windowSCN.transformNormToViewport(
+                point[0][0], point[0][1],
+                0, this->frame_width,
+                0, this->frame_heigth
+                );
 
+            // Converter vetor de volta para ponto
             points[i] = Matrix().vectorToPoint(res);
         }
 
+        // Atualizar os pontos do objeto
         primitive->points = points;
         ui->frame->update();
     } else {

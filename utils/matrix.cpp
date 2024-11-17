@@ -1,5 +1,6 @@
 #include "matrix.h"
 #include "../points.h"
+#include <QDebug>
 
 using namespace std;
 
@@ -33,8 +34,8 @@ vector<vector<double>> Matrix::negative(vector<vector<double>> a){
 
 vector<double> Matrix::rotateVector(double x, double y, double theta) {
     // Cálculo da rotação
-    double cosTheta = cos(theta);
-    double sinTheta = sin(theta);
+    double cosTheta = cos(theta * (M_PI / 180.0) );
+    double sinTheta = sin(theta * (M_PI / 180.0));
 
     // Aplicando a matriz de rotação
     double xNew = cosTheta * x - sinTheta * y;
@@ -79,8 +80,8 @@ vector<vector<double>> Matrix::setTranslationMatrix(vector<vector<double>> value
 
 // get the center point of a figure
 vector<vector<double>> Matrix::pointCenter(vector<Points> points) {
-    int c_x = 0;
-    int c_y = 0;
+    double c_x = 0;
+    double c_y = 0;
 
     for(int i = 0; i < points.size(); i++) {
         c_x += points[i].get_firstPoint();
@@ -95,6 +96,13 @@ vector<vector<double>> Matrix::pointCenter(vector<Points> points) {
     };
 
     return center;
+}
+
+vector<double> Matrix::pointCenterWindow(double xmin, double xmax, double ymin, double ymax) {
+    double xcenter = (xmin + xmax) /2;
+    double ycenter = (ymin + ymax) /2;
+
+    return {xcenter, ycenter};
 }
 
 // receive points and convert to matrix

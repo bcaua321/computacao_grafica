@@ -26,10 +26,15 @@ public:
         : viewUp(initialViewUp) {
         width = widthSCR;
         height = heightSCR;
+        // xMin = centerX - width/ 2.0;
+        // xMax = centerX + width / 2.0;
+        // yMin = centerY - height/ 2.0;;
+        // yMax = centerY + height / 2.0;
         xMin = centerX - width/ 2.0;
         xMax = centerX + width / 2.0;
         yMin = centerY - height/ 2.0;;
         yMax = centerY + height / 2.0;
+
         values = {{2.0/((xMax - xMin)), 2.0/ ((yMax - yMin))}};
         points = {
             Points(xMin, yMin),

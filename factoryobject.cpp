@@ -49,7 +49,7 @@ PrimitiveObject* FactoryObject::create_polygon() {
 
     PrimitiveObject *triangle = new PrimitiveObject(3, "Triangulo", Polygon, points);
     triangle->pointsOriginals = points;
-
+    triangle->pointsNorm = points;
     return triangle;
 }
 

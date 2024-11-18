@@ -48,7 +48,7 @@ else()
 
             utils/matrix.cpp
 
-            widgets/customframe.h widgets/customframe.cpp
+
             utils/window.h utils/window.cpp
 
 

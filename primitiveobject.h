@@ -22,6 +22,7 @@ public:
     PrimitiveType type;
     vector<Points> points;
     vector<Points> pointsOriginals;
+    vector<Points> pointsNorm;
 };
 
 #endif // PRIMITIVEOBJECT_H

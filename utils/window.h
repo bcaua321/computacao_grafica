@@ -10,14 +10,21 @@
 
 using namespace std;
 
+enum WindowTransformationDirection {
+    Left,
+    Right,
+    Up,
+    Down
+};
+
 class Window
 {
 public:
-    double xMin, xMax; // Limites horizontais
-    double yMin, yMax; // Limites verticais
+    double xMin, xMax;
+    double yMin, yMax;
     vector<vector<double>> pointCenter;
     vector<Points> points;
-    vector<double> viewUp; // Direção "para cima"
+    vector<double> viewUp;
     vector<vector<double>> values;
     double width, height;
     vector<vector<double>> translateMatrix  = {{0, 0}};
@@ -28,10 +35,6 @@ public:
         : viewUp(initialViewUp) {
         width = widthSCR;
         height = heightSCR;
-        // xMin = centerX - width/ 2.0;
-        // xMax = centerX + width / 2.0;
-        // yMin = centerY - height/ 2.0;;
-        // yMax = centerY + height / 2.0;
         xMin = centerX - width/ 2.0;
         xMax = centerX + width / 2.0;
         yMin = centerY - height/ 2.0;;
@@ -77,6 +80,61 @@ public:
 
         return {{x_view, y_view}};
     }
+
+
+    vector<Points> normtoViewport(vector<Points> points, double frameWidth, double frameHeight) {
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            point =  Matrix().multiply(point, this->getNormMatrix());
+
+            auto res = this->transformNormToViewport(point[0][0], point[0][1], 0,  frameWidth, 0, frameHeight);
+
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        return points;
+    }
+
+    void translateWindow(WindowTransformationDirection direction) {
+        Matrix matrix;
+
+        vector<vector<double>> translationMatrix = {{0, 0}};
+
+        if(direction == WindowTransformationDirection::Right) {
+            translationMatrix = matrix.setTranslationMatrix({{10, 0}});
+        }
+
+
+        if(direction == WindowTransformationDirection::Left) {
+            translationMatrix = matrix.setTranslationMatrix({{-10, 0}});
+        }
+
+        if(direction == WindowTransformationDirection::Up) {
+            translationMatrix = matrix.setTranslationMatrix({{0, -10}});
+        }
+
+        if(direction == WindowTransformationDirection::Down) {
+            translationMatrix = matrix.setTranslationMatrix({{0, 10}});
+        }
+
+        auto windowPoints = this->points;
+
+        for(int i = 0; i < windowPoints.size(); i++) {
+            auto point = matrix.pointToVector(windowPoints[i]);
+
+            point = matrix.multiply(point, translationMatrix);
+
+            this->points[i] = matrix.vectorToPoint(point);
+        }
+
+
+        this->pointCenter = matrix.pointCenter(this->points);
+        this->recalculateValues(this->pointCenter[0][0], this->pointCenter[0][1]);
+
+
+    }
+
 };
 
 #endif // WINDOW_H

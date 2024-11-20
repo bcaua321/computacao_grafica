@@ -15,7 +15,7 @@ PrimitiveObject* PrimitiveObjectWidget::getCurrentPrimitive() {
 
 void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
     QPainter painter(this);
-    vector<Points> coordinates = this->primitiveObject->points;
+    vector<Points> coordinates = this->primitiveObject->pointsNorm;
 
     if(this->primitiveObject->type == Point) {
         painter.setBrush(Qt::black);

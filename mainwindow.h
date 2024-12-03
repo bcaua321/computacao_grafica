@@ -52,6 +52,9 @@ private slots:
 
     void on_arroRotateRight_clicked();
 
+protected:
+    void resizeEvent(QResizeEvent *event) override;
+
 private:
     Ui::MainWindow *ui;
     int frame_width, frame_heigth;

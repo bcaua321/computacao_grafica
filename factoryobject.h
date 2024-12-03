@@ -13,6 +13,8 @@ public:
     PrimitiveObject* create_point();
     PrimitiveObject* create_line();
     PrimitiveObject* create_polygon();
+    PrimitiveObject* House();
+    PrimitiveObject* create_retangle();
     vector<Points> create_windowCoordiantes(int xMin, int xMax, int yMin, int yMax);
 };
 

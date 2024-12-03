@@ -5,13 +5,16 @@
 #include "./utils/matrix.h"
 #include "./utils/window.h"
 #include <QRect>
+#include "customwidget.h"
 
 GeometricTransformation transformation;
 Window windowSCN(1200/2, 900/2, 1200, 900);
 double angle = 0;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
-    FactoryObject().create_polygon()
+    FactoryObject().create_polygon(),
+    FactoryObject().create_retangle(),
+    FactoryObject().House()
 };
 
 vector<PrimitiveObjectWidget*>  MainWindow::displayFile;
@@ -74,8 +77,10 @@ QWidget* MainWindow::renderWidgets() {
 
     // A seguir, adiciona os widgets filhos ao layout
     for (const auto& widget : MainWindow::displayFile) {
-        hLayout->addWidget(widget); // Define o widget pai corretamente
+        hLayout->addWidget(widget);// Define o widget pai corretamente
     }
+
+    layout->setLayout(hLayout);
 
     // Retorna o widget com os widgets filhos já gerenciados pelo layout
     return layout;
@@ -86,20 +91,14 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    windowSCN = Window(this->ui->frame->width()/2, this->ui->frame->height()/2, this->ui->frame->width(), this->ui->frame->height());
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
     renderComboBox(ui);
     renderComboBoxCoordinates(ui);
     // Use o caractere Unicode θ (U+03B8)
     QString unicodeChar = QString::fromUtf8("\u03B8");
     ui->label_angle->setText(unicodeChar);
-    this->frame_width = ui->frame->width();
-    this->frame_heigth = ui->frame->height();
-
-    // push loaded primitiveObjets and convert to primitiveObjectWidget
-    for (const auto& primitiveObject :  MainWindow::primitiveObjects) {
-        PrimitiveObjectWidget *widget = new PrimitiveObjectWidget(parent, primitiveObject);
-        displayFile.push_back(widget);
-    }
 
     // Cria um layout para o centralWidget se ainda não tiver um
     QHBoxLayout *mainLayout = new QHBoxLayout(ui->centralwidget);
@@ -119,14 +118,28 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->frame->setLayout(frameLayout);
 
-    // Adiciona widgets ou containers dentro do frame
-    QWidget *container = renderWidgets();
-
-    frameLayout->addWidget(container);
-    this->frame_width = ui->frame->width();
-    this->frame_heigth = ui->frame->height();
+    frameLayout->addWidget(new CustomWidget(MainWindow::primitiveObjects));
     // Configurar o QTimer para recalcular as coordenadas
 }
+
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    QMainWindow::resizeEvent(event);
+
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
+        MainWindow::primitiveObjects[i]->pointsNorm = windowSCN.getNormCoordinates(
+            MainWindow::primitiveObjects[i]->points,
+            this->frame_width,
+            this->frame_heigth
+            );
+    }
+
+    ui->frame->update();
+}
+
 
 MainWindow::~MainWindow()
 {
@@ -146,7 +159,8 @@ void MainWindow::on_transformationButton_clicked()
             y.toInt()
         };
 
-        transformation.Translation(primitive->pointsNorm, values);
+        transformation.Translation(primitive->points, values);
+        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -188,7 +202,8 @@ void MainWindow::on_escalationButton_clicked()
         };
 
 
-        transformation.Escalation(primitive->pointsNorm, values);
+        transformation.Escalation(primitive->points, values);
+        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -211,7 +226,8 @@ void MainWindow::on_rotationButton_clicked()
     PrimitiveObject *primitive = selectedObject(ui);
 
     if (primitive != nullptr) {
-        transformation.Rotation(primitive->pointsNorm, tetah.toDouble(), indexOfPoint(ui));
+        transformation.Rotation(primitive->points, tetah.toDouble(), indexOfPoint(ui));
+        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -238,17 +254,13 @@ void MainWindow::on_arrowUp_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    PrimitiveObject *primitive = selectedObject(ui);
-    primitive->pointsNorm = primitive->pointsOriginals;
-
-    if (primitive != nullptr) {
+    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
         windowSCN.translateWindow(WindowTransformationDirection::Up);
 
-        primitive->pointsNorm = windowSCN.normtoViewport(primitive->pointsNorm, this->frame_width, this->frame_heigth);
-        ui->frame->update();
-    } else {
-        qDebug() << "Objeto primitivo não encontrado!";
+        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
     }
+
+    ui->frame->update();
 }
 
 
@@ -257,17 +269,13 @@ void MainWindow::on_arrowDown_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    PrimitiveObject *primitive = selectedObject(ui);
-    primitive->pointsNorm = primitive->pointsOriginals;
-
-    if (primitive != nullptr) {
+    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
         windowSCN.translateWindow(WindowTransformationDirection::Down);
 
-        primitive->pointsNorm  = windowSCN.normtoViewport(primitive->pointsNorm, this->frame_width, this->frame_heigth);
-        ui->frame->update();
-    } else {
-        qDebug() << "Objeto primitivo não encontrado!";
+        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
     }
+
+    ui->frame->update();
 }
 
 
@@ -276,17 +284,13 @@ void MainWindow::on_arrowLeft_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    PrimitiveObject *primitive = selectedObject(ui);
-    primitive->pointsNorm = primitive->pointsOriginals;
-
-    if (primitive != nullptr) {
+    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
         windowSCN.translateWindow(WindowTransformationDirection::Left);
 
-        primitive->pointsNorm  = windowSCN.normtoViewport(primitive->pointsNorm, this->frame_width, this->frame_heigth);
-        ui->frame->update();
-    } else {
-        qDebug() << "Objeto primitivo não encontrado!";
+        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
     }
+
+    ui->frame->update();
 }
 
 
@@ -295,17 +299,13 @@ void MainWindow::on_arrowRight_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    PrimitiveObject *primitive = selectedObject(ui);
-    primitive->pointsNorm = primitive->pointsOriginals;
-
-    if (primitive != nullptr) {
+    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
         windowSCN.translateWindow(WindowTransformationDirection::Right);
 
-        primitive->pointsNorm = windowSCN.normtoViewport(primitive->pointsNorm, this->frame_width, this->frame_heigth);
-        ui->frame->update();
-    } else {
-        qDebug() << "Objeto primitivo não encontrado!";
+        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
     }
+
+    ui->frame->update();
 }
 
 void MainWindow::on_arroRotateLeft_clicked()
@@ -368,7 +368,6 @@ void MainWindow::on_arroRotateLeft_clicked()
         // Aplicar rotação reversa para corrigir a orientação da janela
         windowSCN.viewUp = matrix.rotateVector(windowSCN.viewUp[0], windowSCN.viewUp[1], -angle);
         geometric.RotationTest(windowSCN.points, -angle);
-
 
         // Atualizar os pontos do objeto
         primitive->pointsNorm = points;

@@ -74,6 +74,29 @@ public:
         return res;
     }
 
+    vector<Points> getNormCoordinates(vector<Points> points, double widthVP, double heightVP) {
+        for(int i = 0; i < points.size(); i++) {
+            // Converter ponto para vetor
+            auto point = Matrix().pointToVector(points[i]);
+
+            // Aplicar matriz de normalização ajustada com o ângulo calculado
+            point = Matrix().multiply(point, this->getNormMatrix());
+
+            // Aplicar transformação para a viewport
+            auto res = this->transformNormToViewport(
+                point[0][0], point[0][1],
+                0, widthVP,
+                0, heightVP
+                );
+
+            // Converter vetor de volta para ponto
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+
+        return points;
+    }
+
     vector<vector<double>> transformNormToViewport(double x_scn, double y_scn, double min_x, double max_x, double min_y, double max_y) {
         double x_view = ((x_scn + 1) / 2) * max_x;
         double y_view =  ((y_scn + 1) / 2) * max_y;
@@ -105,7 +128,6 @@ public:
             translationMatrix = matrix.setTranslationMatrix({{10, 0}});
         }
 
-
         if(direction == WindowTransformationDirection::Left) {
             translationMatrix = matrix.setTranslationMatrix({{-10, 0}});
         }
@@ -131,8 +153,6 @@ public:
 
         this->pointCenter = matrix.pointCenter(this->points);
         this->recalculateValues(this->pointCenter[0][0], this->pointCenter[0][1]);
-
-
     }
 
 };

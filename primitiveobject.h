@@ -10,7 +10,8 @@ using namespace std;
 enum PrimitiveType {
     Point,
     Line,
-    Polygon
+    Polygon,
+    Rect
 };
 
 class PrimitiveObject

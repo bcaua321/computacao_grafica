@@ -48,10 +48,46 @@ PrimitiveObject* FactoryObject::create_polygon() {
     };
 
     PrimitiveObject *triangle = new PrimitiveObject(3, "Triangulo", Polygon, points);
-    triangle->pointsOriginals = points;
-    triangle->pointsNorm = points;
     return triangle;
 }
+
+PrimitiveObject* FactoryObject::create_retangle() {
+    vector<Points> points = {
+        Points(10, 10),
+        Points(100, 50)
+    };
+
+    PrimitiveObject *retangle = new PrimitiveObject(4, "Retangle", Rect, points);
+    return retangle;
+}
+
+PrimitiveObject* FactoryObject::House() {
+    vector<Points> housePoints = {
+        // Base da casa
+        Points(50, 50), Points(150, 50),
+        Points(150, 150), Points(50, 150),
+        Points(50, 50),
+
+        // Telhado
+        Points(50, 150), Points(100, 200),
+        Points(150, 150),
+
+        // Porta
+        Points(90, 50), Points(90, 100),
+        Points(110, 100), Points(110, 50),
+        Points(90, 50),
+
+        // Janela
+        Points(60, 110), Points(80, 110),
+        Points(80, 130), Points(60, 130),
+        Points(60, 110)
+    };
+
+    PrimitiveObject *house = new PrimitiveObject(5, "House", Polygon, housePoints);
+
+    return house;
+}
+
 
 vector<Points> FactoryObject::create_windowCoordiantes(int xMin, int xMax, int yMin, int yMax) {
     vector<Points> points = {

@@ -30,6 +30,11 @@ void PrimitiveObjectWidget::paintEvent(QPaintEvent* event) {
 
     if(this->primitiveObject->type == Polygon) {
         QPolygon polygon;
+
+        for(int i = 0; i < coordinates.size(); i++) {
+
+        }
+
         polygon << QPoint(coordinates[0].get_firstPoint(), coordinates[0].get_secondPoint())
                 << QPoint(coordinates[1].get_firstPoint(), coordinates[1].get_secondPoint())
                 << QPoint(coordinates[2].get_firstPoint(), coordinates[2].get_secondPoint());

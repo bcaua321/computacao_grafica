@@ -5,6 +5,7 @@
 #include <QWidget>
 #include "primitiveobject.h"
 #include <QPainter>
+#include <QPainterPath>
 
 using namespace std;
 
@@ -37,20 +38,19 @@ protected:
             }
 
             if(primitiveObject->type == Rect) {
-                painter.drawRect(10, 10, 1200, 900);
+                painter.drawRect(10, 10, 1576, 948);
                 continue;
             }
 
-            if(primitiveObject->type == Polygon) {
-                QPolygon polygon;
-
-                for (int i = 0; i < coordinates.size(); i++) {
-                    polygon << QPoint(coordinates[i].get_firstPoint(), coordinates[i].get_secondPoint());
+            if (primitiveObject->type == Polygon) {
+                for (size_t i = 0; i < coordinates.size() - 1; ++i) {
+                    painter.drawLine(
+                        coordinates[i].get_firstPoint(), coordinates[i].get_secondPoint(),
+                        coordinates[i + 1].get_firstPoint(), coordinates[i + 1].get_secondPoint()
+                        );
                 }
-
-                painter.drawPolygon(polygon);
-                continue;
             }
+
         }
     }
 };

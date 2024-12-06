@@ -23,6 +23,7 @@ public:
     PrimitiveType type;
     vector<Points> points;
     vector<Points> pointsOriginals;
+    vector<vector<double>> pointsNormalizados;
     vector<Points> pointsNorm;
 };
 

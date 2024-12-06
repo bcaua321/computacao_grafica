@@ -4,14 +4,15 @@
 class Points
 {
 public:
-    Points(int point_one, int point_two);
-    int get_firstPoint();
-    int get_secondPoint();
-    void set_x(int newX);
-    void set_y(int newY);
+    Points();
+    Points(double point_one, double point_two);
+    double get_firstPoint();
+    double get_secondPoint();
+    void set_x(double newX);
+    void set_y(double newY);
 private:
-    int point_one;
-    int point_two;
+    double point_one;
+    double point_two;
 };
 
 #endif // POINTS_H

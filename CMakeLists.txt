@@ -51,6 +51,9 @@ else()
 
             utils/window.h utils/window.cpp
             customwidget.h customwidget.cpp
+            utils/clipping.h utils/clipping.cpp
+
+
 
 
 

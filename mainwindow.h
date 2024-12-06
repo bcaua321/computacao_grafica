@@ -52,6 +52,9 @@ private slots:
 
     void on_arroRotateRight_clicked();
 
+    void calculateCoordinates();
+
+    void calculateCoordinatesIndividual(PrimitiveObject* object);
 protected:
     void resizeEvent(QResizeEvent *event) override;
 

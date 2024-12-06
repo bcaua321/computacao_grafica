@@ -114,7 +114,6 @@ vector<vector<double>> Matrix::pointToVector(Points points) {
     return vec;
 }
 
-
 // receive matrix and convert to points
 Points Matrix::vectorToPoint(vector<vector<double>> vec) {
     Points points(vec[0][0], vec[0][1]);

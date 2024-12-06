@@ -6,18 +6,17 @@
 #include "./utils/window.h"
 #include <QRect>
 #include "customwidget.h"
+#include "./utils/clipping.h"
 
 GeometricTransformation transformation;
-Window windowSCN(1200/2, 900/2, 1200, 900);
+Window windowSCN(600, 300, 1200, 600);
+Clipping* clipping = NULL;
 double angle = 0;
 
 vector<PrimitiveObject*> MainWindow::primitiveObjects = {
-    FactoryObject().create_polygon(),
-    FactoryObject().create_retangle(),
-    FactoryObject().House()
+    FactoryObject::create_rectangle(),
+    FactoryObject::House()
 };
-
-vector<PrimitiveObjectWidget*>  MainWindow::displayFile;
 
 string coordenadasParaString(Points point) {
     return "(" + to_string(point.get_firstPoint()) + ", " + to_string(point.get_secondPoint()) + ")";
@@ -57,10 +56,12 @@ void renderComboBoxCoordinates(Ui::MainWindow* ui) {
     int i = 0;
     auto selected = selectedObject(ui);
     Matrix matrix;
+
     if (!selected) {
         // Trata o caso de selected ser nullptr
         return;
     }
+
     ui->comboBox_2->clear();
 
     for (const auto& point : selected->points) {
@@ -69,21 +70,61 @@ void renderComboBoxCoordinates(Ui::MainWindow* ui) {
     }
 }
 
-QWidget* MainWindow::renderWidgets() {
-    // Cria o widget pai que conterá os widgets filhos
-    QWidget *layout = new QWidget(this);
+void MainWindow::calculateCoordinates() {
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
 
-    QHBoxLayout* hLayout = new QHBoxLayout(layout);
+    // Definir o espaçamento para borda
+    int borderSpacing = 10; // Espaçamento de 10 px nas bordas
 
-    // A seguir, adiciona os widgets filhos ao layout
-    for (const auto& widget : MainWindow::displayFile) {
-        hLayout->addWidget(widget);// Define o widget pai corretamente
+    // Calcular as dimensões do retângulo interno
+    int rectWidth = this->frame_width - 2 * borderSpacing; // Subtrai o espaçamento das bordas
+    int rectHeight = this->frame_heigth - 2 * borderSpacing; // Subtrai o espaçamento das bordas
+
+    // Calcular as posições do retângulo
+    int rectX = borderSpacing;  // Posição X com 10 px de borda
+    int rectY = borderSpacing;  // Posição Y com 10 px de borda
+
+
+    for (int i = 1; i < MainWindow::primitiveObjects.size(); i++) {
+        MainWindow::primitiveObjects[i]->pointsNorm =  windowSCN.normPoint(primitiveObjects[i]->points);
     }
 
-    layout->setLayout(hLayout);
+    for (int i = 1; i < MainWindow::primitiveObjects.size(); i++) {
+        MainWindow::primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(
+            MainWindow::primitiveObjects[i]->pointsNorm,
+            rectX,
+            rectY,
+            rectWidth,
+            rectHeight
+            );
+    }
+}
 
-    // Retorna o widget com os widgets filhos já gerenciados pelo layout
-    return layout;
+void MainWindow::calculateCoordinatesIndividual(PrimitiveObject* object) {
+    this->frame_width = ui->frame->width();
+    this->frame_heigth = ui->frame->height();
+
+    // Definir o espaçamento para borda
+    int borderSpacing = 10; // Espaçamento de 10 px nas bordas
+
+    // Calcular as dimensões do retângulo interno
+    int rectWidth = this->frame_width - 2 * borderSpacing; // Subtrai o espaçamento das bordas
+    int rectHeight = this->frame_heigth - 2 * borderSpacing; // Subtrai o espaçamento das bordas
+
+    // Calcular as posições do retângulo
+    int rectX = borderSpacing;  // Posição X com 10 px de borda
+    int rectY = borderSpacing;  // Posição Y com 10 px de borda
+
+    object->pointsNorm =  windowSCN.normPoint(object->points);
+
+    object->pointsNorm = windowSCN.normtoViewport(
+        object->pointsNorm,
+        rectX,
+        rectY,
+        rectWidth,
+        rectHeight
+    );
 }
 
 MainWindow::MainWindow(QWidget *parent)
@@ -91,8 +132,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
+
 
     renderComboBox(ui);
     renderComboBoxCoordinates(ui);
@@ -118,28 +161,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->frame->setLayout(frameLayout);
 
+
     frameLayout->addWidget(new CustomWidget(MainWindow::primitiveObjects));
-    // Configurar o QTimer para recalcular as coordenadas
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
 
-    this->frame_width = ui->frame->width();
-    this->frame_heigth = ui->frame->height();
-
-    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
-        MainWindow::primitiveObjects[i]->pointsNorm = windowSCN.getNormCoordinates(
-            MainWindow::primitiveObjects[i]->points,
-            this->frame_width,
-            this->frame_heigth
-            );
-    }
+    this->calculateCoordinates();
 
     ui->frame->update();
 }
-
 
 MainWindow::~MainWindow()
 {
@@ -160,10 +193,10 @@ void MainWindow::on_transformationButton_clicked()
         };
 
         transformation.Translation(primitive->points, values);
-        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
+        this->calculateCoordinatesIndividual(primitive);
 
         // update the coordinates
-        for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
+        for (int i = 1; i < MainWindow::primitiveObjects.size(); i++) {
             if(primitiveObjects[i]->id == primitive->id) {
                 primitiveObjects[i] = primitive;
             }
@@ -181,7 +214,6 @@ void MainWindow::on_escalationButton_clicked()
     QString y = ui->lineEdit_y_2->text();
 
     PrimitiveObject *primitive = selectedObject(ui);;
-
 
     if (primitive != nullptr) {
         double x_double = x.toDouble();
@@ -203,7 +235,7 @@ void MainWindow::on_escalationButton_clicked()
 
 
         transformation.Escalation(primitive->points, values);
-        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
+        this->calculateCoordinatesIndividual(primitive);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -227,7 +259,7 @@ void MainWindow::on_rotationButton_clicked()
 
     if (primitive != nullptr) {
         transformation.Rotation(primitive->points, tetah.toDouble(), indexOfPoint(ui));
-        primitive->pointsNorm = windowSCN.getNormCoordinates(primitive->points, this->frame_width, this->frame_heigth);
+        this->calculateCoordinatesIndividual(primitive);
 
         // update the coordinates
         for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
@@ -235,6 +267,7 @@ void MainWindow::on_rotationButton_clicked()
                 primitiveObjects[i] = primitive;
             }
         }
+
 
         ui->frame->update();  // repaint primitiveObjectWidget
     } else {
@@ -254,11 +287,9 @@ void MainWindow::on_arrowUp_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
-        windowSCN.translateWindow(WindowTransformationDirection::Up);
+    windowSCN.translateWindow(WindowTransformationDirection::Up);
 
-        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
-    }
+    this->calculateCoordinates();
 
     ui->frame->update();
 }
@@ -269,11 +300,9 @@ void MainWindow::on_arrowDown_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
-        windowSCN.translateWindow(WindowTransformationDirection::Down);
+    windowSCN.translateWindow(WindowTransformationDirection::Down);
 
-        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
-    }
+    this->calculateCoordinates();
 
     ui->frame->update();
 }
@@ -284,11 +313,9 @@ void MainWindow::on_arrowLeft_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
-        windowSCN.translateWindow(WindowTransformationDirection::Left);
+    windowSCN.translateWindow(WindowTransformationDirection::Left);
 
-        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
-    }
+    this->calculateCoordinates();
 
     ui->frame->update();
 }
@@ -299,11 +326,9 @@ void MainWindow::on_arrowRight_clicked()
     this->frame_width = ui->frame->width();
     this->frame_heigth = ui->frame->height();
 
-    for (int i = 0; i < MainWindow::primitiveObjects.size(); i++) {
-        windowSCN.translateWindow(WindowTransformationDirection::Right);
+    windowSCN.translateWindow(WindowTransformationDirection::Right);
 
-        primitiveObjects[i]->pointsNorm = windowSCN.normtoViewport(primitiveObjects[i]->points, this->frame_width, this->frame_heigth);
-    }
+    this->calculateCoordinates();
 
     ui->frame->update();
 }

@@ -7,6 +7,7 @@
 #include <algorithm>
 #include "../factoryobject.h"
 #include "../points.h"
+#include "./clipping.h"
 
 using namespace std;
 
@@ -98,20 +99,58 @@ public:
     }
 
     vector<vector<double>> transformNormToViewport(double x_scn, double y_scn, double min_x, double max_x, double min_y, double max_y) {
-        double x_view = ((x_scn + 1) / 2) * max_x;
-        double y_view =  ((y_scn + 1) / 2) * max_y;
-
+        double x_view = ((x_scn + 1) / 2)  * (max_x - min_x) + min_x;
+        double y_view =  ((y_scn + 1) / 2) * (max_y - min_y) + min_y;
         return {{x_view, y_view}};
     }
 
+    vector<vector<double>> transformNormToViewportClipping(double x_scn, double y_scn, double viewport_x, double viewport_y, double width, double height) {
+        // Transformação do eixo X
+        double x_viewport = ((x_scn + 1) / 2.0) * width + viewport_x;
 
-    vector<Points> normtoViewport(vector<Points> points, double frameWidth, double frameHeight) {
+        // Transformação do eixo Y (inversão do eixo para coordenadas gráficas)
+        double y_viewport = (1 - (y_scn + 1) / 2.0) * height + viewport_y;
+
+        return {{x_viewport, y_viewport}};
+    }
+
+    vector<Points> normPoint(vector<Points> points) {
+        Clipping *clipping = new Clipping(1, -1, 1, -1);
+
+        for(int i = 0; i < points.size() - 1; i++) {
+            auto pointA = Matrix().pointToVector(points[i]);
+            auto pointB = Matrix().pointToVector(points[i + 1]);
+
+            pointA =  Matrix().multiply(pointA, this->getNormMatrix());
+            pointB = Matrix().multiply(pointB, this->getNormMatrix());
+
+            clipping->cohenSutherlandClip(pointA, pointB);
+
+            points[i] = Matrix().vectorToPoint(pointA);
+            points[i + 1] = Matrix().vectorToPoint(pointB);
+        }
+
+        return points;
+    }
+
+    vector<Points> normToView(vector<Points> points, double minFrameWidth, double frameWidth, double minFrameHeight,double frameHeight) {
         for(int i = 0; i < points.size(); i++) {
             auto point = Matrix().pointToVector(points[i]);
 
-            point =  Matrix().multiply(point, this->getNormMatrix());
+            auto res = this->transformNormToViewport(point[0][0], point[0][1], minFrameWidth, frameWidth, minFrameHeight, frameHeight);
 
-            auto res = this->transformNormToViewport(point[0][0], point[0][1], 0,  frameWidth, 0, frameHeight);
+            points[i] = Matrix().vectorToPoint(res);
+        }
+
+        return points;
+    }
+
+
+    vector<Points> normtoViewport(vector<Points> points, double viewport_x, double viewport_y, double width, double height) {
+        for(int i = 0; i < points.size(); i++) {
+            auto point = Matrix().pointToVector(points[i]);
+
+            auto res = this->transformNormToViewportClipping(point[0][0], point[0][1], viewport_x, viewport_y, width, height);
 
             points[i] = Matrix().vectorToPoint(res);
         }

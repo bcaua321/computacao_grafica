@@ -1,17 +1,16 @@
 #include "factoryobject.h"
 
-FactoryObject::FactoryObject() {
+// Inicializa o contador estático
+int FactoryObject::current_id = 1;
 
-}
+FactoryObject::FactoryObject() {}
 
 vector<PrimitiveObject*> FactoryObject::create_list() {
-    PrimitiveObject *line = this->create_line();
-    PrimitiveObject *point = this->create_point();
-    PrimitiveObject *polygon = this->create_polygon();
+    PrimitiveObject* point = create_point();
+    PrimitiveObject* polygon = create_polygon();
 
     vector<PrimitiveObject*> list_objects = {
         point,
-        line,
         polygon
     };
 
@@ -23,19 +22,18 @@ PrimitiveObject* FactoryObject::create_point() {
         Points(25, 25),
     };
 
-    PrimitiveObject *point = new PrimitiveObject(1, "Point", Point, points);
+    PrimitiveObject* point = new PrimitiveObject(current_id++, "Point", Point, points);
 
     return point;
 }
 
-
-PrimitiveObject* FactoryObject::create_line() {
+PrimitiveObject* FactoryObject::create_line(Points a, Points b) {
     vector<Points> points = {
-        Points(50, 50),
-        Points(50, 100)
+        a,
+        b
     };
 
-    PrimitiveObject *line = new PrimitiveObject(2, "Reta", Line, points);
+    PrimitiveObject* line = new PrimitiveObject(current_id++, "Line", Line, points);
 
     return line;
 }
@@ -47,49 +45,53 @@ PrimitiveObject* FactoryObject::create_polygon() {
         Points(150, 150)
     };
 
-    PrimitiveObject *triangle = new PrimitiveObject(3, "Triangulo", Polygon, points);
+    PrimitiveObject* triangle = new PrimitiveObject(current_id++, "Triangle", Polygon, points);
     return triangle;
 }
 
-PrimitiveObject* FactoryObject::create_retangle() {
+PrimitiveObject* FactoryObject::create_rectangle() {
     vector<Points> points = {
         Points(10, 10),
         Points(100, 50)
     };
 
-    PrimitiveObject *retangle = new PrimitiveObject(4, "Retangle", Rect, points);
-    return retangle;
+    PrimitiveObject* rectangle = new PrimitiveObject(current_id++, "Rectangle", Rect, points);
+    return rectangle;
 }
 
 PrimitiveObject* FactoryObject::House() {
     vector<Points> housePoints = {
-        // Base da casa
-        Points(50, 50), Points(150, 50),
-        Points(150, 150), Points(50, 150),
-        Points(50, 50),
+                                  // Base da casa
+                                  Points(50, 150), Points(150, 150),
+                                  Points(150, 50), Points(50, 50),
+                                  Points(50, 150),
 
-        // Telhado
-        Points(50, 150), Points(100, 200),
-        Points(150, 150),
+                                  // Telhado
+                                  Points(50, 50), Points(100, 10),
+                                  Points(150, 50),
 
-        // Porta
-        Points(90, 50), Points(90, 100),
-        Points(110, 100), Points(110, 50),
-        Points(90, 50),
+                                  // Porta
+                                  Points(90, 150), Points(90, 110),
+                                  Points(110, 110), Points(110, 150),
+                                  Points(90, 150),
 
-        // Janela
-        Points(60, 110), Points(80, 110),
-        Points(80, 130), Points(60, 130),
-        Points(60, 110)
+                                  // Janela (esquerda)
+                                  Points(60, 90), Points(80, 90),
+                                  Points(80, 70), Points(60, 70),
+                                  Points(60, 90),
+
+                                  // Janela (direita)
+                                  Points(120, 90), Points(140, 90),
+                                  Points(140, 70), Points(120, 70),
+                                  Points(120, 90)
     };
 
-    PrimitiveObject *house = new PrimitiveObject(5, "House", Polygon, housePoints);
+    PrimitiveObject* house = new PrimitiveObject(current_id++, "House", Polygon, housePoints);
 
     return house;
 }
 
-
-vector<Points> FactoryObject::create_windowCoordiantes(int xMin, int xMax, int yMin, int yMax) {
+vector<Points> FactoryObject::create_windowCoordinates(int xMin, int xMax, int yMin, int yMax) {
     vector<Points> points = {
         Points(xMin, yMin),
         Points(xMax, yMin),
@@ -97,7 +99,5 @@ vector<Points> FactoryObject::create_windowCoordiantes(int xMin, int xMax, int y
         Points(xMin, yMax)
     };
 
-
     return points;
 }
-
